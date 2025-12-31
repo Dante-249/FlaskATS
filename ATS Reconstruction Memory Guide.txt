@@ -1,0 +1,246 @@
+This is an excellent question — and a very engineer-level way of thinking.
+You’re basically asking:
+
+“If ChatGPT forgets everything, how do I reconstruct the entire ATS context fast and correctly?”
+
+I’ll give you a clean, future-proof answer you can literally paste in a new chat and continue instantly.
+
+🧠 ATS ARCHITECTURE — FULL CONTEXT (WHAT WE BUILT)
+1️⃣ High-Level Overview
+
+This is a local, file-based Applicant Tracking System (ATS) built using Flask + SQLite, supporting:
+
+Professional Boolean search
+
+Phrase handling
+
+Relevance-based ranking
+
+Resume indexing (PDF & DOCX)
+
+Clean UI
+
+Architecture Flow
+Resumes (PDF/DOCX)
+        ↓
+index_resumes.py
+        ↓
+SQLite (database.db)
+        ↓
+Flask App (app.py)
+        ↓
+Boolean Engine (boolean_engine.py)
+        ↓
+Relevance Engine (relevance.py)
+        ↓
+index.html (UI)
+
+2️⃣ File-by-File Breakdown (THIS IS THE KEY PART)
+🔹 index_resumes.py — Resume Indexer
+
+Purpose:
+Reads resumes from a local folder and stores searchable text in SQLite.
+
+Responsibilities:
+
+Extract text from:
+
+PDFs (via pdfplumber)
+
+DOCX (via python-docx)
+
+Normalize content
+
+Store:
+
+filename
+
+full text
+
+last modified date
+
+file type
+
+Output:
+
+resumes (
+  file_name,
+  file_path,
+  content,
+  modified_date,
+  file_type
+)
+
+
+This runs once or whenever resumes change.
+
+🔹 database.db — Resume Store
+
+Purpose:
+Acts as a local search index.
+
+Stores full resume text
+
+No full-text search engine needed (Boolean handled in Python)
+
+🔹 boolean_engine.py — Boolean Query Engine (CORE)
+
+Purpose:
+Evaluates whether a resume matches a Boolean query.
+
+Features:
+
+AND / OR / NOT operators
+
+Parentheses
+
+Quoted phrases
+
+Case-insensitive
+
+Safe failure (invalid queries don’t crash ATS)
+
+How it works internally:
+
+Normalize query
+
+Tokenize query
+
+Convert to Reverse Polish Notation (Shunting Yard algorithm)
+
+Evaluate against resume text
+
+Output:
+
+True  # resume matches
+False # resume does not match
+
+
+👉 This decides WHO passes, not ranking.
+
+🔹 relevance.py — Relevance Ranking Engine
+
+Purpose:
+Ranks resumes after Boolean match.
+
+Important rule:
+
+Boolean decides eligibility, relevance decides order
+
+Rules implemented:
+
+First keyword = highest priority
+
+Quoted phrases > single words
+
+Query order matters
+
+Presence > frequency (anti-spam)
+
+Deterministic ranking (no randomness)
+
+Output:
+
+score = compute_relevance(query, resume_text)
+
+
+Higher score = higher ranking.
+
+🔹 app.py — Flask Controller
+
+Purpose:
+Connects everything.
+
+Flow inside / route:
+
+Receive Boolean query from UI
+
+Fetch all resumes from DB
+
+For each resume:
+
+evaluate_boolean(query, content)
+
+If True → compute_relevance(query, content)
+
+Sort by:
+
+relevance score (desc)
+
+modified date (desc)
+
+Send results to UI
+
+Also includes:
+
+Resume file serving
+
+Keyword highlighting filter for UI
+
+🔹 index.html — UI Layer
+
+Purpose:
+User interface for ATS.
+
+Features:
+
+Boolean query input
+
+Query persistence after submit
+
+Results table
+
+Keyword highlighting
+
+Clean, professional layout
+
+Does NOT:
+
+Compute logic
+
+Rank results
+
+Evaluate Boolean
+
+(UI is intentionally “dumb” — logic lives in Python)
+
+3️⃣ Separation of Concerns (VERY IMPORTANT)
+
+This ATS was built with clean architectural boundaries:
+
+Layer	Responsibility
+UI	Display only
+Flask	Orchestration
+Boolean Engine	Match / No match
+Relevance Engine	Ranking
+Indexer	Data ingestion
+DB	Storage
+
+That’s why debugging eventually worked.
+
+4️⃣ One-Paragraph “Memory Restore Prompt” (SAVE THIS)
+
+If you ever start a new chat, paste this exact block:
+
+I built a local Flask-based ATS. Resumes are indexed from PDF/DOCX into SQLite using index_resumes.py. Boolean search is handled by a custom boolean_engine.py using tokenization, shunting-yard, and RPN evaluation (AND/OR/NOT, parentheses, quoted phrases). After Boolean pass, resumes are ranked using relevance.py where first keyword and quoted phrases have higher weight and presence matters more than frequency. Flask app.py orchestrates this and index.html is the UI with query persistence and keyword highlighting.
+
+That will instantly restore 100% context.
+
+5️⃣ Final Truth (engineer to engineer)
+
+What you built is not a toy.
+It’s a proper ATS MVP with clean architecture.
+
+If this were on GitHub with a README, no one would question it.
+
+When you’re ready, next logical steps are:
+
+Match % calculation
+
+JD → Boolean auto-generator
+
+Resume explanation (“why this matched”)
+
+Skill taxonomy
+
+Whenever you want — I’m here.

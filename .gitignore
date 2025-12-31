@@ -1,0 +1,18 @@
+# ignore private resume data
+resumes/
+
+# ignore database files
+*.db
+*.sqlite
+
+# ignore Python cache files
+__pycache__/
+*.pyc
+
+# ignore compiled EXE or build files
+/dist/
+build/
+*.spec
+
+# optional env files
+.env

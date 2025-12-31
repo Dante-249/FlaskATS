@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask ATS – Boolean Resume Search Powered by Awadhesh</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a4a4a;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f9f9fb;
+            border: 1px solid #e0e0e0;
+        }
+
+        .section h2 {
+            margin-top: 0;
+            color: #5a5a8a;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .help {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .search-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .search-btn:hover {
+            background: #5a6fe0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f1f9;
+            color: #444;
+        }
+
+        tr:hover {
+            background: #f5f5ff;
+        }
+
+        a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .no-results {
+            margin-top: 20px;
+            color: #c0392b;
+            font-weight: 600;
+        }
+
+        .example {
+            background: #eef2ff;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Flask Based ATS</h1>
+    <center><h3>Architected by Mr. Awadhesh</h3></center>
+    <p class="subtitle">Search resumes stored on your local system using Boolean queries</p>
+
+    <form method="post">
+
+        <!-- Boolean Search -->
+        <div class="section">
+            <h2>Boolean Search (Advanced)</h2>
+
+            <label>Boolean Query</label>
+            <input type="text" name="boolean_query"
+                   placeholder='("spring boot" OR springboot) AND java AND NOT sales'
+                   value="{{ query or '' }}">
+
+            <div class="help">Supports AND, OR, NOT, quotes and parentheses</div>
+
+            <div class="example">
+                Examples:<br>
+                "customer support"<br>
+                java AND springboot<br>
+                ("spring boot" OR springboot) AND java<br>
+                customer AND NOT sales
+            </div>
+        </div>
+
+        <button class="search-btn" type="submit">🔍 Search Resumes</button>
+        <a href="{{ url_for('architecture') }}" class="search-btn">ATS System Architecture</a>
+
+
+    </form>
+
+    {% if matches %}
+        <h2>Search Results</h2>
+        <table>
+            <tr>
+                <th>Resume File</th>
+                <th>Last Modified</th>
+            </tr>
+            {% for m in matches %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('serve_resume', filename=m[0]) }}" target="_blank">
+                        {{ m[0]|highlight_keywords(query)|safe }}
+                    </a>
+                </td>
+                <td>{{ m[2] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% elif matches is not none %}
+        <p class="no-results">No matching resumes found.</p>
+    {% endif %}
+
+</div>
+
+</body>
+</html>

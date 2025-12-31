@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ATS Architecture – Awadhesh</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f9f9fb;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #4a4a4a;
+        }
+        pre {
+            background: #eef2ff;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        ul, ol {
+            margin-left: 20px;
+        }
+        a.button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #667eea;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        a.button:hover {
+            background: #5a6fe0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🧠 ATS Architecture – Full Context</h1>
+    <p>This page explains the complete architecture of our Flask-based ATS built locally with SQLite and Python.</p>
+
+    <h2>1️⃣ High-Level Overview</h2>
+    <p>Local file-based Applicant Tracking System supporting:</p>
+    <ul>
+        <li>Professional Boolean search</li>
+        <li>Phrase handling</li>
+        <li>Relevance-based ranking</li>
+        <li>Resume indexing (PDF & DOCX)</li>
+        <li>Clean UI</li>
+    </ul>
+
+    <pre>
+Resumes (PDF/DOCX)
+        ↓
+index_resumes.py
+        ↓
+SQLite (database.db)
+        ↓
+Flask App (app.py)
+        ↓
+Boolean Engine (boolean_engine.py)
+        ↓
+Relevance Engine (relevance.py)
+        ↓
+index.html (UI)
+    </pre>
+
+    <h2>2️⃣ File-by-File Breakdown</h2>
+    <ul>
+        <li><strong>index_resumes.py</strong> – Index resumes into SQLite</li>
+        <li><strong>database.db</strong> – Local resume storage</li>
+        <li><strong>boolean_engine.py</strong> – Evaluate Boolean queries</li>
+        <li><strong>relevance.py</strong> – Compute relevance score for ranking</li>
+        <li><strong>app.py</strong> – Flask orchestration, routes, keyword highlighting</li>
+        <li><strong>index.html</strong> – UI for Boolean search & results</li>
+    </ul>
+
+    <h2>3️⃣ Separation of Concerns</h2>
+    <table border="1" cellpadding="5">
+        <tr><th>Layer</th><th>Responsibility</th></tr>
+        <tr><td>UI</td><td>Display only</td></tr>
+        <tr><td>Flask</td><td>Orchestration</td></tr>
+        <tr><td>Boolean Engine</td><td>Match / No match</td></tr>
+        <tr><td>Relevance Engine</td><td>Ranking</td></tr>
+        <tr><td>Indexer</td><td>Data ingestion</td></tr>
+        <tr><td>DB</td><td>Storage</td></tr>
+    </table>
+
+    <h2>4️⃣ Memory Restore Prompt</h2>
+    <pre>
+I built a local Flask-based ATS. Resumes are indexed from PDF/DOCX into SQLite using index_resumes.py. 
+Boolean search is handled by boolean_engine.py with tokenization and RPN evaluation. 
+After Boolean pass, resumes are ranked using relevance.py. Flask app.py orchestrates logic, and index.html handles UI with keyword highlighting.
+    </pre>
+
+    <h2>5️⃣ Next Steps</h2>
+    <ul>
+        <li>Match % calculation</li>
+        <li>JD → Boolean auto-generator</li>
+        <li>Resume explanation (“why this matched”)</li>
+        <li>Skill taxonomy</li>
+    </ul>
+
+    <a href="{{ url_for('index') }}" class="button">Back to ATS</a>
+</div>
+
+</body>
+</html>
