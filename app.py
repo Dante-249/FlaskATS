@@ -3,6 +3,8 @@ import sqlite3
 import re
 import os
 from markupsafe import Markup
+from docx import Document
+import textract  # for .doc files
 
 from boolean_engine import evaluate_boolean
 from relevance import compute_relevance
@@ -26,6 +28,37 @@ else:
     RESUME_FOLDER = "sample_resumes"     # Demo folder for GitHub
 
 app = Flask(__name__)
+
+
+# ========================
+# HELPER FUNCTION TO READ FILE CONTENT
+# ========================
+
+def read_file_content(path):
+    ext = path.lower().split(".")[-1]
+
+    if ext == "txt":
+        try:
+            with open(path, "r", encoding="utf-8", errors="ignore") as f:
+                return f.read()
+        except:
+            return ""
+    
+    elif ext == "docx":
+        try:
+            doc = Document(path)
+            full_text = [para.text for para in doc.paragraphs]
+            return "\n".join(full_text)
+        except:
+            return ""
+    
+    elif ext == "doc":
+        try:
+            return textract.process(path).decode("utf-8")
+        except:
+            return ""
+    
+    return ""
 
 
 # ========================
@@ -68,18 +101,17 @@ def index():
         if IS_RENDER or RESUME_FOLDER == "sample_resumes":
             for file_name in os.listdir(RESUME_FOLDER):
                 path = os.path.join(RESUME_FOLDER, file_name)
-                # Only read supported files for demo
-                if file_name.lower().endswith((".txt", ".pdf", ".docx")):
-                    content = ""  # For demo, no parsing yet
-                    if boolean_query:
-                        # Optionally skip relevance in demo
-                        score = 0
+                if file_name.lower().endswith((".txt", ".docx", ".doc")):
+                    content = read_file_content(path)
+                    # Apply boolean search
+                    if boolean_query and evaluate_boolean(boolean_query, content):
+                        score = compute_relevance(boolean_query, content)
                         matches.append((file_name, path, os.path.getmtime(path), score))
-                    else:
+                    elif not boolean_query:
                         matches.append((file_name, path, os.path.getmtime(path), 0))
 
-            # Sort by modification date (most recent first)
-            matches.sort(key=lambda x: x[2], reverse=True)
+            # Sort by relevance first → recent second (for demo, score is 0 if no query)
+            matches.sort(key=lambda x: (x[3], x[2]), reverse=True)
 
         # ------------------------
         # Local full ATS: use database
