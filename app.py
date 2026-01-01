@@ -4,24 +4,27 @@ import re
 import os
 from markupsafe import Markup
 from docx import Document
-import textract  # for .doc files
-
-from boolean_engine import evaluate_boolean
-from relevance import compute_relevance
-
-
-# ========================
-# CONFIG (MUST BE AT TOP)
-# ========================
-
-DB_NAME = "database.db"
 
 # Detect Render environment
 IS_RENDER = os.environ.get("RENDER") == "true"
 
-# Automatically choose folder:
-# - If "resumes/" exists → use PRIVATE DATA (local only)
-# - Else → use "sample_resumes/" (GitHub demo)
+# Only import textract for local environment
+if not IS_RENDER:
+    try:
+        import textract  # for .doc files locally
+    except ImportError:
+        textract = None
+
+from boolean_engine import evaluate_boolean
+from relevance import compute_relevance
+
+# ========================
+# CONFIG
+# ========================
+
+DB_NAME = "database.db"
+
+# Choose folder based on environment
 if os.path.exists("resumes") and not IS_RENDER:
     RESUME_FOLDER = "resumes"            # Local private resumes
 else:
@@ -29,9 +32,8 @@ else:
 
 app = Flask(__name__)
 
-
 # ========================
-# HELPER FUNCTION TO READ FILE CONTENT
+# HELPER FUNCTION
 # ========================
 
 def read_file_content(path):
@@ -47,19 +49,20 @@ def read_file_content(path):
     elif ext == "docx":
         try:
             doc = Document(path)
-            full_text = [para.text for para in doc.paragraphs]
-            return "\n".join(full_text)
+            return "\n".join([p.text for p in doc.paragraphs])
         except:
             return ""
     
     elif ext == "doc":
-        try:
-            return textract.process(path).decode("utf-8")
-        except:
+        if not IS_RENDER and textract:
+            try:
+                return textract.process(path).decode("utf-8")
+            except:
+                return ""
+        else:
             return ""
     
     return ""
-
 
 # ========================
 # JINJA FILTER
@@ -82,7 +85,6 @@ def highlight_keywords(text, query):
         )
     return Markup(highlighted)
 
-
 # ========================
 # ROUTES
 # ========================
@@ -103,14 +105,12 @@ def index():
                 path = os.path.join(RESUME_FOLDER, file_name)
                 if file_name.lower().endswith((".txt", ".docx", ".doc")):
                     content = read_file_content(path)
-                    # Apply boolean search
                     if boolean_query and evaluate_boolean(boolean_query, content):
                         score = compute_relevance(boolean_query, content)
                         matches.append((file_name, path, os.path.getmtime(path), score))
                     elif not boolean_query:
                         matches.append((file_name, path, os.path.getmtime(path), 0))
 
-            # Sort by relevance first → recent second (for demo, score is 0 if no query)
             matches.sort(key=lambda x: (x[3], x[2]), reverse=True)
 
         # ------------------------
@@ -130,7 +130,6 @@ def index():
                     score = compute_relevance(boolean_query, content)
                     matches.append((file_name, file_path, modified_date, score))
 
-            # Sort by relevance first → recent second
             matches.sort(key=lambda x: (x[3], x[2]), reverse=True)
 
     return render_template(
@@ -138,7 +137,6 @@ def index():
         matches=matches,
         query=boolean_query
     )
-
 
 # ========================
 # SERVE RESUME FILES
@@ -148,7 +146,6 @@ def index():
 def serve_resume(filename):
     return send_from_directory(RESUME_FOLDER, filename)
 
-
 # ========================
 # ATS ARCHITECTURE VISUAL
 # ========================
@@ -156,7 +153,6 @@ def serve_resume(filename):
 @app.route("/architecture")
 def architecture():
     return render_template("architecture.html")
-
 
 # ========================
 # START APP
