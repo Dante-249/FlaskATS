@@ -141,8 +141,8 @@ def serve_resume(filename):
 
 @app.route("/architecture")
 def architecture():
-    # Make sure template filename matches exactly (Architecture.html)
-    return render_template("Architecture.html")
+    # Make sure template filename matches exactly (architecture.html)
+    return render_template("architecture.html")
 
 # ========================
 # START APP
