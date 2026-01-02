@@ -22,13 +22,13 @@ from relevance import compute_relevance
 # CONFIG
 # ========================
 
-DB_NAME = "database.db"
-
-# Choose folder based on environment
+# Choose folder and DB based on environment
 if os.path.exists("resumes") and not IS_RENDER:
-    RESUME_FOLDER = "resumes"            # Local private resumes
+    RESUME_FOLDER = "resumes"            
+    DB_NAME = "database.db"             # full ATS DB
 else:
-    RESUME_FOLDER = "sample_resumes"     # Demo folder for GitHub
+    RESUME_FOLDER = "sample_resumes"
+    DB_NAME = "sample_db.db"            # sample DB for faster search
 
 app = Flask(__name__)
 
@@ -54,6 +54,7 @@ def read_file_content(path):
             return ""
     
     elif ext == "doc":
+        # On Render, skip content for .doc
         if not IS_RENDER and textract:
             try:
                 return textract.process(path).decode("utf-8")
@@ -98,39 +99,27 @@ def index():
         boolean_query = request.form.get("boolean_query", "").strip()
 
         # ------------------------
-        # Public demo: read from sample_resumes folder
+        # Use database for both sample and local resumes
         # ------------------------
-        if IS_RENDER or RESUME_FOLDER == "sample_resumes":
-            for file_name in os.listdir(RESUME_FOLDER):
-                path = os.path.join(RESUME_FOLDER, file_name)
-                if file_name.lower().endswith((".txt", ".docx", ".doc")):
-                    content = read_file_content(path)
-                    if boolean_query and evaluate_boolean(boolean_query, content):
-                        score = compute_relevance(boolean_query, content)
-                        matches.append((file_name, path, os.path.getmtime(path), score))
-                    elif not boolean_query:
-                        matches.append((file_name, path, os.path.getmtime(path), 0))
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT file_name, file_path, content, modified_date FROM resumes"
+        )
+        rows = cursor.fetchall()
+        conn.close()
 
-            matches.sort(key=lambda x: (x[3], x[2]), reverse=True)
-
-        # ------------------------
-        # Local full ATS: use database
-        # ------------------------
-        else:
-            conn = sqlite3.connect(DB_NAME)
-            cursor = conn.cursor()
-            cursor.execute(
-                "SELECT file_name, file_path, content, modified_date FROM resumes"
-            )
-            rows = cursor.fetchall()
-            conn.close()
-
-            for file_name, file_path, content, modified_date in rows:
-                if boolean_query and evaluate_boolean(boolean_query, content):
+        for file_name, file_path, content, modified_date in rows:
+            if boolean_query:
+                # Only search if content exists
+                if content and evaluate_boolean(boolean_query, content):
                     score = compute_relevance(boolean_query, content)
                     matches.append((file_name, file_path, modified_date, score))
+            else:
+                matches.append((file_name, file_path, modified_date, 0))
 
-            matches.sort(key=lambda x: (x[3], x[2]), reverse=True)
+        # Sort by relevance first → recent second
+        matches.sort(key=lambda x: (x[3], x[2]), reverse=True)
 
     return render_template(
         "index.html",
@@ -152,7 +141,8 @@ def serve_resume(filename):
 
 @app.route("/architecture")
 def architecture():
-    return render_template("architecture.html")
+    # Make sure template filename matches exactly (Architecture.html)
+    return render_template("Architecture.html")
 
 # ========================
 # START APP
