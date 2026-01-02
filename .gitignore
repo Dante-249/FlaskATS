@@ -2,7 +2,7 @@
 resumes/
 
 # ignore database files
-*.db
+database.db
 *.sqlite
 
 # ignore Python cache files
