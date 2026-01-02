@@ -1,0 +1,271 @@
+body {
+    background: linear-gradient(
+        180deg,
+        #90db9b 0%,
+        #1d4be0 100%
+    ) !important;
+}
+
+   
+* {
+    box-sizing: border-box;
+}
+
+
+/* =========================
+   MAIN CONTAINER
+   ========================= */
+.container {
+    max-width: 1200px;
+    margin: 48px auto;
+    padding: 48px;
+    background: rgba(15, 23, 42, 0.85);
+    border-radius: 18px;
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.45),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+/* =========================
+   HEADINGS
+   ========================= */
+h1 {
+    font-size: 2.6rem;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+    background: linear-gradient(90deg, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+h2 {
+    margin-top: 56px;
+    font-size: 1.6rem;
+    letter-spacing: -0.01em;
+    color: #93c5fd;
+    border-left: 4px solid #38bdf8;
+    padding-left: 14px;
+}
+
+p {
+    color: #cbd5f5;
+    max-width: 900px;
+}
+
+/* =========================
+   LISTS
+   ========================= */
+ul, ol {
+    margin-top: 16px;
+    padding-left: 22px;
+}
+
+li {
+    margin: 10px 0;
+    color: #dbeafe;
+}
+
+li strong {
+    color: #e0f2fe;
+}
+
+/* =========================
+   CODE BLOCKS
+   ========================= */
+pre {
+    margin-top: 20px;
+    background: radial-gradient(
+        circle at top left,
+        #020617,
+        #020617
+    );
+    border-radius: 14px;
+    padding: 22px 26px;
+    font-family: "JetBrains Mono", Consolas, monospace;
+    font-size: 0.95rem;
+    color: #a5f3fc;
+    overflow-x: auto;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.08);
+}
+
+/* =========================
+   TABLES
+   ========================= */
+table {
+    width: 100%;
+    margin-top: 24px;
+    border-collapse: collapse;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #020617;
+}
+
+th {
+    background: linear-gradient(180deg, #1e293b, #020617);
+    color: #e0f2fe;
+    text-align: left;
+    padding: 14px 18px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+td {
+    padding: 14px 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    color: #c7d2fe;
+}
+
+tr:hover td {
+    background: rgba(56, 189, 248, 0.04);
+}
+
+/* =========================
+   DIAGRAM LAYOUT
+   ========================= */
+.diagram {
+    margin-top: 40px;
+    padding: 40px;
+    border-radius: 18px;
+    background: linear-gradient(
+        145deg,
+        rgba(2, 6, 23, 0.95),
+        rgba(15, 23, 42, 0.9)
+    );
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 80px;
+    margin-top: 30px;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* =========================
+   BOXES (ARCHITECTURE NODES)
+   ========================= */
+.box {
+    min-width: 260px;
+    padding: 18px 22px;
+    margin: 12px 0;
+    text-align: center;
+    border-radius: 14px;
+    background:
+        linear-gradient(180deg, #020617, #020617),
+        linear-gradient(90deg, #38bdf8, #818cf8);
+    background-clip: padding-box, border-box;
+    border: 1px solid transparent;
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.35);
+    font-size: 0.95rem;
+    color: #e5f3ff;
+}
+
+.box strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 1rem;
+    color: #7dd3fc;
+}
+
+/* =========================
+   ARROWS
+   ========================= */
+.arrow {
+    width: 0;
+    height: 0;
+    margin: 14px 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 16px solid #38bdf8;
+    filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.6));
+}
+
+/* =========================
+   FOLDER VIEW
+   ========================= */
+.section {
+    margin-top: 70px;
+}
+
+.folder {
+    margin-top: 18px;
+    padding: 18px 22px;
+    border-radius: 14px;
+    background: rgba(2, 6, 23, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.folder-name {
+    font-weight: 600;
+    color: #7dd3fc;
+}
+
+.folder-desc {
+    margin-left: 12px;
+    font-style: italic;
+    color: #94a3b8;
+}
+
+.file {
+    display: flex;
+    justify-content: space-between;
+    margin-left: 22px;
+    padding: 6px 0;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.85rem;
+}
+
+.file-name {
+    color: #e0f2fe;
+}
+
+.file-desc {
+    color: #94a3b8;
+}
+
+/* =========================
+   NOTES / CALLOUTS
+   ========================= */
+.note {
+    margin-top: 30px;
+    padding: 18px 22px;
+    border-radius: 14px;
+    background: linear-gradient(
+        145deg,
+        rgba(30, 58, 138, 0.2),
+        rgba(2, 6, 23, 0.9)
+    );
+    border-left: 4px solid #38bdf8;
+    color: #dbeafe;
+}
+
+/* =========================
+   BUTTON
+   ========================= */
+.button {
+    display: inline-block;
+    margin-top: 40px;
+    padding: 14px 28px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #020617;
+    background: linear-gradient(90deg, #38bdf8, #818cf8);
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: 0 12px 30px rgba(56, 189, 248, 0.45);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 45px rgba(56, 189, 248, 0.65);
+}

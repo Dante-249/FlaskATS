@@ -4,62 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <title>ATS Architecture – Awadhesh</title>
-    <style>
-        body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #f9f9fb;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
+<link rel="stylesheet" href="{{ url_for('static', filename='css/architecture.css') }}">
 
-        .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 30px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        }
 
-        h1,
-        h2,
-        h3 {
-            color: #4a4a4a;
-        }
-
-        pre {
-            background: #eef2ff;
-            padding: 15px;
-            border-radius: 6px;
-            overflow-x: auto;
-        }
-
-        ul,
-        ol {
-            margin-left: 20px;
-        }
-
-        a.button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #667eea;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 6px;
-        }
-
-        a.button:hover {
-            background: #5a6fe0;
-        }
-    </style>
 </head>
 
 <body>
 
     <div class="container">
         <h1>🧠 ATS Architecture – Full Context</h1>
+
         <p>This page explains the complete architecture of our Flask-based ATS built locally with SQLite and Python.</p>
 
         <h2>1️⃣ High-Level Overview</h2>
@@ -86,7 +40,7 @@ Boolean Engine (boolean_engine.py)
 Relevance Engine (relevance.py)
         ↓
 index.html (UI)
-    </pre>
+        </pre>
 
         <h2>2️⃣ File-by-File Breakdown</h2>
         <ul>
@@ -99,7 +53,7 @@ index.html (UI)
         </ul>
 
         <h2>3️⃣ Separation of Concerns</h2>
-        <table border="1" cellpadding="5">
+        <table>
             <tr>
                 <th>Layer</th>
                 <th>Responsibility</th>
@@ -135,69 +89,176 @@ index.html (UI)
 I built a local Flask-based ATS. Resumes are indexed from PDF/DOCX into SQLite using index_resumes.py. 
 Boolean search is handled by boolean_engine.py with tokenization and RPN evaluation. 
 After Boolean pass, resumes are ranked using relevance.py. Flask app.py orchestrates logic, and index.html handles UI with keyword highlighting.
-    </pre>
+        </pre>
 
-        <h2>5️⃣ Next Steps</h2>
-        <ul>
-            <li>Match % calculation</li>
-            <li>JD → Boolean auto-generator</li>
-            <li>Resume explanation (“why this matched”)</li>
-            <li>Skill taxonomy</li>
-        </ul>
         <h2>6️⃣ Updated Model Architecture as we lost old .DB</h2>
         <ul>
             <li>
-                When deploying our website to platforms such as <em>GitHub</em> and <em>Render.com</em>, we faced a key
-                challenge:
-                we did not want to upload or expose our private <code>resumes</code> folder containing real candidate
-                data.
-                To solve this, we created a separate <code>sample_resumes</code> folder that contains only a few test
-                resumes
-                for demonstration purposes.
-
-                Since the original database was already indexed with private <em>resumes</em> folder, we decided to
-                reset the project
-                and initialize Git again to avoid tracking sensitive data because it was tracking the 3000 original
-                resumes which we do not want. With time, i understood that i had to delete my complete project where
-                from the starting of the project i don't have to track resumes folder. This allowed us to create a fresh
-                database
-                that works only with public sample resumes. From the beginning of this new setup, the private
-                <code>resumes</code> folder was added to <code>.gitignore</code> to ensure it is never uploaded to
-                GitHub
-                or any public platform.
-
-                During this process, we recreated the database structure and introduced two utility scripts:
-                <code>create_db.py</code> to initialize the database schema and <code>add_column.py</code> to handle
-                future schema updates if required. With these changes in place, the project was successfully deployed
-                on <em>Render.com</em>.
-
-                Currently, the deployed version supports <code>.docx</code> resume files, while the <code>.doc</code>
-                format is not supported due to platform and library limitations. This approach allowed us to maintain
-                data privacy while ensuring a fully functional public demo of the ATS system.
+                When deploying to <em>GitHub</em> or <em>Render.com</em>, we avoided exposing the private <code>resumes/</code> folder.
+                We created <code>sample_resumes/</code> for demo resumes. A fresh DB was initialized, and <code>resumes/</code> added to <code>.gitignore</code>.
+                Scripts <code>create_db.py</code> and <code>add_column.py</code> were introduced. The deployed version supports <code>.docx</code> only.
             </li>
-
         </ul>
+
         <ol>
             <h2>Notes</h2>
-            <li>
-                create_db.py → run once in project lifetime</li>
-            <li>
-                add_column.py → Ask GPT
-            </li>
-            <li>
-                index_resumes.py → run every time resumes change
-            </li>
-            <li>
-                app.py → never touches filesystem indexing
-            </li>
-            <li>
-                Database → source of truth
-            </li>
-            </li>
+            <li>create_db.py → run once per project lifetime</li>
+            <li>add_column.py → use for schema updates</li>
+            <li>index_resumes.py → run whenever resumes change</li>
+            <li>app.py → never touches filesystem indexing</li>
+            <li>Database → source of truth</li>
         </ol>
+
+        <h1>Updated High-Level Diagrammatic Overview of ATS Project</h1>
+        <div class="diagram">
+            <div class="box"><strong>User</strong><br>(Web Browser / Render)</div>
+            <div class="arrow"></div>
+            <div class="box"><strong>Flask App</strong><br>(app.py)</div>
+
+            <div class="row">
+                <div class="column">
+                    <div class="arrow" style="transform: rotate(270deg);"></div>
+                    <div class="box">
+                        <strong>Local Machine ATS</strong><br>
+                        RESUME_FOLDER = "resumes/"<br>
+                        DB_NAME = "database.db"<br>
+                        .txt/.docx/.doc supported<br>
+                        Search using database<br>
+                        File & DB Indexing (create_db.py / index_resumes.py)
+                    </div>
+                    <div class="arrow"></div>
+                    <div class="box">
+                        <strong>database.db</strong><br>
+                        - file_name<br>- file_path<br>- file_type<br>- content<br>- modified_date
+                    </div>
+                    <div class="arrow"></div>
+                    <div class="box">
+                        <strong>Resume Files</strong><br>
+                        resumes/ (private, large set)<br>.txt, .docx, .doc
+                    </div>
+                </div>
+
+                <div class="column">
+                    <div class="arrow" style="transform: rotate(270deg);"></div>
+                    <div class="box">
+                        <strong>Render / GitHub Demo</strong><br>
+                        RESUME_FOLDER = "sample_resumes/"<br>
+                        DB_NAME = "sample_db.db"<br>
+                        .txt/.docx supported (.doc skipped)<br>
+                        Search using pre-built DB<br>
+                        File & DB Indexing (create_sample_db.py)
+                    </div>
+                    <div class="arrow"></div>
+                    <div class="box">
+                        <strong>sample_db.db</strong><br>
+                        - file_name<br>- file_path<br>- file_type<br>- content<br>- modified_date
+                    </div>
+                    <div class="arrow"></div>
+                    <div class="box">
+                        <strong>Resume Files</strong><br>
+                        sample_resumes/ (small demo set)<br>.txt, .docx
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h1>📁 MVP ATS Project – Folder Overview</h1>
+
+            <div class="folder">
+                <span class="folder-name">resumes/</span>
+                <span class="folder-desc">Local private resumes (not tracked in Git)</span>
+                <div class="file"><span class="file-name">resume1.docx</span><span class="file-desc">Sample resume</span></div>
+                <div class="file"><span class="file-name">resume2.doc</span><span class="file-desc">Sample resume</span></div>
+                <div class="file"><span class="file-name">...</span></div>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">sample_resumes/</span>
+                <span class="folder-desc">Public demo resumes for Render/GitHub</span>
+                <div class="file"><span class="file-name">sample1.docx</span><span class="file-desc">Demo resume</span></div>
+                <div class="file"><span class="file-name">sample2.txt</span><span class="file-desc">Demo resume</span></div>
+                <div class="file"><span class="file-name">...</span></div>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">templates/</span>
+                <span class="folder-desc">HTML templates for Flask</span>
+                <div class="file"><span class="file-name">index.html</span><span class="file-desc">Main UI for search</span></div>
+                <div class="file"><span class="file-name">architecture.html</span><span class="file-desc">ATS architecture page</span></div>
+                <div class="file"><span class="file-name">...</span></div>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">database.db</span>
+                <span class="folder-desc">Local SQLite DB for full ATS (private resumes)</span>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">sample_db.db</span>
+                <span class="folder-desc">SQLite DB for Render/GitHub demo (sample resumes)</span>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">app.py</span>
+                <span class="folder-desc">Main Flask application</span>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">create_db.py</span>
+                <span class="folder-desc">Script to create database schema</span>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">create_sample_db.py</span>
+                <span class="folder-desc">Script to create DB for sample_resumes</span>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">add_column.py</span>
+                <span class="folder-desc">Utility to add new column(s) to DB</span>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">index_resumes.py</span>
+                <span class="folder-desc">Script to read resumes and insert into DB</span>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">boolean_engine.py</span>
+                <span class="folder-desc">Handles Boolean query evaluation</span>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">relevance.py</span>
+                <span class="folder-desc">Calculates relevance score for search results</span>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">search_resumes.py</span>
+                <span class="folder-desc">Optional helper script to search resumes manually</span>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">requirements.txt</span>
+                <span class="folder-desc">Python dependencies</span>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">README.md</span>
+                <span class="folder-desc">Project overview / instructions</span>
+            </div>
+
+            <div class="folder">
+                <span class="folder-name">.gitignore</span>
+                <span class="folder-desc">Ensures <code>resumes/</code> and sensitive files are not tracked</span>
+            </div>
+            <div class="note">
+                💡 <strong>Notes:</strong> Run <code>index_resumes.py</code> whenever resumes change. Use <code>create_db.py</code> or <code>create_sample_db.py</code> only once to initialize databases. Never upload <code>resumes/</code> to GitHub.
+            </div>
+
+        </div>
         <a href="{{ url_for('index') }}" class="button">Back to ATS</a>
     </div>
-
 </body>
-
 </html>
