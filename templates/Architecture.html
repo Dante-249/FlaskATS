@@ -146,12 +146,44 @@ After Boolean pass, resumes are ranked using relevance.py. Flask app.py orchestr
         </ul>
         <h2>6️⃣ Updated Model Architecture as we lost old .DB</h2>
         <ul>
-            <li>We had to create 2 new .py files which are 1. add_column.py and 2. create_db.py</li>
+            <li>
+                When deploying our website to platforms such as <em>GitHub</em> and <em>Render.com</em>, we faced a key
+                challenge:
+                we did not want to upload or expose our private <code>resumes</code> folder containing real candidate
+                data.
+                To solve this, we created a separate <code>sample_resumes</code> folder that contains only a few test
+                resumes
+                for demonstration purposes.
+
+                Since the original database was already indexed with private <em>resumes</em> folder, we decided to
+                reset the project
+                and initialize Git again to avoid tracking sensitive data because it was tracking the 3000 original
+                resumes which we do not want. With time, i understood that i had to delete my complete project where
+                from the starting of the project i don't have to track resumes folder. This allowed us to create a fresh
+                database
+                that works only with public sample resumes. From the beginning of this new setup, the private
+                <code>resumes</code> folder was added to <code>.gitignore</code> to ensure it is never uploaded to
+                GitHub
+                or any public platform.
+
+                During this process, we recreated the database structure and introduced two utility scripts:
+                <code>create_db.py</code> to initialize the database schema and <code>add_column.py</code> to handle
+                future schema updates if required. With these changes in place, the project was successfully deployed
+                on <em>Render.com</em>.
+
+                Currently, the deployed version supports <code>.docx</code> resume files, while the <code>.doc</code>
+                format is not supported due to platform and library limitations. This approach allowed us to maintain
+                data privacy while ensuring a fully functional public demo of the ATS system.
+            </li>
+
         </ul>
         <ol>
             <h2>Notes</h2>
             <li>
                 create_db.py → run once in project lifetime</li>
+            <li>
+                add_column.py → Ask GPT
+            </li>
             <li>
                 index_resumes.py → run every time resumes change
             </li>
